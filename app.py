@@ -1,21 +1,21 @@
 from flask import Flask, render_template
-import json
+import pymongo
 
-import psycopg2 
+#Crear conexión con mongo
+conn = "mongodb://localhost:27017"
+client = pymongo.MongoClient(conn)
 
+#Nos conectamos con nuestra Base de Datos
+db = client.moviesProject_DB
 
-app = Flask(__name__)
-
-
+app = Flask (__name__)
 
 @app.route("/")
 def home():
-  return render_template("home.html")
+        #print(db.list_database_names_())
+        movies = list(db.movies.find())
+        print(movies)
+        return render_template("index.html", movies = movies)
 
-
-def graph():
-  return render_template("index.html")
-
-
-if __name__=="__main__":
-    app.run(debug=True)
+if __name__ == "__main__":
+        app.run(debug = True)
