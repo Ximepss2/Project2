@@ -8,7 +8,9 @@ client = pymongo.MongoClient(conn)
 #Nos conectamos con nuestra Base de Datos
 db = client.moviesProject_DB
 
-app = Flask (__name__)
+app = Flask(__name__,
+            static_url_path='', 
+            static_folder='static')
 
 @app.route("/")
 def home():
