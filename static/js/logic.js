@@ -1,112 +1,63 @@
-$(document).ready(function(){
-    (function($){ 
-      var cards = $(".card-drop"),
-          toggler = cards.find(".toggle"),
-          links = cards.find("ul>li>a"),
-          li = links.parent('li'),
-          count = links.length,
-          width = links.outerWidth();
-  
-  console.info(count);
-  console.info(width);
-  console.info(toggler);
-  console.info(links);
-  console.info(li);
-  console.info(cards );
-  
-          //set z-Index of drop Items
-          links.parent("li").each(function(i){
-              $(this).css("z-index" , count - i); //invert the index values
-          });
-  
-          //set top margins & widths of li elements
-          function setClosed(){
-              li.each(function(index){
-                   $(this).css("top" , index *2)
-                                                
-                           .css("width" , width - index *20)
-                           .css("margin-left" , (index*20)/2)
-                                                  .css("margin-left" , (index*20)/2);
-              });
-                         
-              li.addClass('closed');
-              toggler.removeClass("active");
-          }
-          setClosed();
-  
-      /* -------------------------------------------------------- */ 
-      /*	Toggler Click handler
-      /* -------------------------------------------------------- */ 
-      toggler.on("mousedown" , function(){
-          var $this = $(this); //cache $(this)
-          //if the menu is active:
-                 console.info(this);
-          if($this.is(".active")){
-              setClosed();
-          }else{
-              //if the menu is un-active:
-              $this.addClass("active");
-              li.removeClass('closed');
-              //set top margins
-              li.each(function(index){
-                   $(this).css("top" , 60 * (index + 1))
-                           .css("width" ,"70%")
-                           .css("margin-left" , "40px");
-              });
-          }
-      });
-  
-      /* -------------------------------------------------------- */ 
-      /*	Links Click handler
-      /* -------------------------------------------------------- */ 
-      links.on("click" , function(e){
-          var $this = $(this),
-              label = $this.data("label");
-              icon = $this.children("i").attr("class");
-              
-              li.removeClass('active');
-          if($this.parent("li").is("active")){
-              $this.parent('li').removeClass("active");
-          }else{
-              $this.parent("li").addClass("active");
-          }
-          toggler.children("span").text(label);
-          toggler.children("i").removeClass().addClass(icon);
-          setClosed();
-          e.preventDefault;
-          console.log(label);
-          d3.select("body").selectAll("svg").remove();
-          createGraph();
 
-      });
-  
-  })(jQuery);
-  }); 
+console.log("Holi");
+d3.select("#movies").on("change", function() {
+  let itemString = d3.select("#movies").node().value
+  console.log(itemString);
+  d3.select("#cont").selectAll("svg").remove();
+  d3.json("/api/genre/" + itemString, function(data) {
+    var peliculas = data.data.slice(1,20);
+    createGraph(itemString, peliculas);
+  })
+});
 
-function createGraph(){
+
+function createGraph(itemString, peliculas){
    /* Diagram */
+  
   var treeData = [
     {
-      "name": "Top Level",
+      "name": itemString,
       "parent": "null",
       "children": [
         {
-          "name": "Level 2: A",
+          "name": peliculas.slice(0)[0]["Title"],
           "parent": "Top Level",
-          "children": [
-            {
-              "name": "Son of A",
-              "parent": "Level 2: A"
-            },
-            {
-              "name": "Daughter of A",
-              "parent": "Level 2: A"
-            }
-          ]
         },
         {
-          "name": "Level 2: B",
+          "name": peliculas.slice(0)[1]["Title"],
           "parent": "Top Level"
+        },
+        {
+          "name": peliculas.slice(0)[2]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[3]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[4]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[5]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[6]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[7]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[8]["Title"],
+          "parent": "Top Level",
+        },
+        {
+          "name": peliculas.slice(0)[9]["Title"],
+          "parent": "Top Level",
         }
       ]
     }
@@ -133,7 +84,7 @@ function createGraph(){
   var diagonal = d3.svg.diagonal()
       .projection(function(d) { return [d.y, d.x]; });
   
-  var svg = d3.select("#grid")
+  var svg = d3.select("#cont")
       .append("svg")
       .attr("id","treeg")
       .attr("width", width + margin.right + margin.left)
@@ -172,7 +123,17 @@ function createGraph(){
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-        .on("click", click);
+        .on("click",function() {
+          click;
+          var title = $( this ).text();
+          d3.json("/api/movieDescription/" + title, function(pelicula) {
+            console.log(pelicula.pelicula[0]);
+            document.getElementById("titupeli").innerHTML = title;
+            document.getElementById("director").innerHTML = "Director: " + pelicula.pelicula[0]["Director"];
+            document.getElementById("leadr").innerHTML = "Leading Role: " + pelicula.pelicula[0]["Leading_Role"];
+            document.getElementById("rating").innerHTML = "Rating: " + pelicula.pelicula[0]["Rating"];
+          })
+        })
   
     nodeEnter.append("circle")
         .attr("r", 1e-6)
@@ -182,7 +143,7 @@ function createGraph(){
         .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
         .attr("dy", ".35em")
         .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-        .text(function(d) { return d.name; })
+        .text(function(d) { return d.name })
         .style("fill-opacity", 1e-6);
   
     // Transition nodes to their new position.

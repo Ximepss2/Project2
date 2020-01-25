@@ -1,5 +1,5 @@
 #Import dependencies
-import pandas as pdpython
+import pandas as pd
 import numpy as np
 import json
 from sqlalchemy import create_engine

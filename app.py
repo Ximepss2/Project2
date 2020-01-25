@@ -21,11 +21,11 @@ def home():
         print(movies)
         return render_template("index.html", movies = movies)
 
-@app.route("/start")
-def inicio():
-        start = list(db.start.find())
-        print(start)
-        return render_template("home.html", start = start)
+#@app.route("/start")
+#def inicio():
+ #       start = list(db.start.find())
+  #      print(start)
+   #     return render_template("home.html", start = start)
 
 
 #@app.route("/api/oneGenre/<one>")
